@@ -50,7 +50,7 @@ public class ListMeetingActivity extends AppCompatActivity implements View.OnCli
     @BindView(R.id.btn_dateClear)
     Button btnDateClearPicker;
 //    @BindView(R.id.in_dateFilter)
-    EditText txtDateFilter;
+    TextView txtDateFilter;
     String txtDateString = DummyMeetingApiService.NO_DATE_FILTER;
     private int mYear, mMonth, mDay;
 
@@ -61,6 +61,7 @@ public class ListMeetingActivity extends AppCompatActivity implements View.OnCli
          ButterKnife.bind(this);
 
          setSupportActionBar(mToolbar);
+         Log.i("neighbour","ListMeetingActivity.onCreate reinit getNewInstanceApiService");
          mApiService = DI.getMeetingApiService();
          initRoomSpinner();
 
@@ -69,18 +70,17 @@ public class ListMeetingActivity extends AppCompatActivity implements View.OnCli
          txtDateFilter = findViewById(R.id.in_dateFilter);
          btnDateFilterPicker.setOnClickListener(this);
          btnDateClearPicker.setOnClickListener(this);
-         txtDateFilter.setFocusable(false);
-         txtDateString = DummyMeetingApiService.NO_DATE_FILTER;
+         initDateFilter(DummyMeetingApiService.NO_DATE_FILTER);
          txtDateFilter.setText(txtDateString);
-
-//         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 
          if (findViewById(R.id.container) != null) {
             if (savedInstanceState != null) {
-                mApiService.restore();
+                mApiService = DI.getNewInstanceApiService();
+                initRoomSpinner();
+                initDateFilter(DummyMeetingApiService.NO_DATE_FILTER);
             }
 
-            Log.i("neighbour","ListMeetingActivity.onCreate");
+            Log.i("neighbour","ListMeetingActivity.onCreate fragment");
             fragment = new MeetingFragment().newInstance();
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.container, fragment)
@@ -93,8 +93,8 @@ public class ListMeetingActivity extends AppCompatActivity implements View.OnCli
     @Override
     public void onClick(View v)
     {
-        final Calendar c = Calendar.getInstance();
         if (v == btnDateFilterPicker) {
+            final Calendar c = Calendar.getInstance();
             mYear = c.get(Calendar.YEAR);
             mMonth = c.get(Calendar.MONTH);
             mDay = c.get(Calendar.DAY_OF_MONTH);
@@ -105,16 +105,16 @@ public class ListMeetingActivity extends AppCompatActivity implements View.OnCli
                         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                             Log.i("neighbour","ListMeetingActivity.onDateSet DatePicker");
                             initDateFilter(year + "." + (monthOfYear+1) + "." + dayOfMonth);
-                            txtDateFilter.setText(new String(txtDateString));
-                            fragment.filterList(roomFilter, dateBeginFilter, dateEndFilter);
+                            txtDateFilter.setText(txtDateString);
+                            fragment.initList();
                         }
                     }, mYear, mMonth, mDay);
             datePickerDialog.show();
         }
         if (v == btnDateClearPicker) {
             initDateFilter(DummyMeetingApiService.NO_DATE_FILTER);
-            txtDateFilter.setText(new String(txtDateString));
-            fragment.filterList(roomFilter, dateBeginFilter, dateEndFilter);
+            txtDateFilter.setText(txtDateString);
+            fragment.initList();
          }
     }
 
@@ -124,7 +124,7 @@ public class ListMeetingActivity extends AppCompatActivity implements View.OnCli
         EventBus.getDefault().register(this);
         Log.i("neighbour","ListMeetingActivity.onStart");
         initRoomSpinner();
-        fragment.filterList(roomFilter, dateBeginFilter, dateEndFilter);
+        fragment.initList();
     }
 
     @Override
@@ -137,12 +137,12 @@ public class ListMeetingActivity extends AppCompatActivity implements View.OnCli
         Log.i("neighbour","ListMeetingActivity.initDateFilter txtDateFilter.setText " + s);
         if (s.equals(DummyMeetingApiService.NO_DATE_FILTER)) {
             Log.i("neighbour","ListMeetingActivity.initDateFilter dummy" + s);
-            txtDateString = new String(s);
+            txtDateString = s;
             dateBeginFilter = s;
             dateEndFilter = s;
         } else {
             Log.i("neighbour","ListMeetingActivity.initDateFilter valid date " + s);
-            txtDateString = new String(s);
+            txtDateString = s;
             dateBeginFilter = s + " 0.0";
             dateEndFilter = s + " 23.59";
         }
@@ -173,7 +173,8 @@ public class ListMeetingActivity extends AppCompatActivity implements View.OnCli
         Log.i("neighbour","onDeleteNeighbour " + event.meeting.getRoom());
         mApiService.deleteMeeting(event.meeting);
         initRoomSpinner();
-        fragment.filterList(roomFilter, dateBeginFilter, dateEndFilter);
+        initDateFilter(txtDateString);
+        fragment.initList();
     }
 
     @OnItemSelected(R.id.spinnerRoom)
@@ -183,7 +184,8 @@ public class ListMeetingActivity extends AppCompatActivity implements View.OnCli
         if (selectedText != null) selectedText.setTextColor(Color.WHITE);
         roomFilter = array_spinner.get(pos);
         Log.i("neighbour","ListMeetingActivity.onItemSelected " + roomFilter + " " + dateBeginFilter + " " + dateEndFilter);
-        fragment.filterList(roomFilter, dateBeginFilter, dateEndFilter);
+        mApiService.registerFilter(roomFilter, dateBeginFilter, dateEndFilter);
+        fragment.initList();
     }
 
     @OnClick(R.id.add_meeting)

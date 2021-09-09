@@ -30,6 +30,12 @@ public interface MeetingApiService {
     void createMeeting(Meeting meeting);
 
     /**
+     * Create a meeting
+     * @param meeting
+     */
+    boolean isMeetingAlreadyExists(Meeting meeting);
+
+    /**
      * Register filter
      * @param nameRoom
      */
@@ -39,9 +45,4 @@ public interface MeetingApiService {
      * {@inheritDoc}
      */
     List<String> getRooms();
-
-    /**
-     *
-     */
-    void restore();
 }

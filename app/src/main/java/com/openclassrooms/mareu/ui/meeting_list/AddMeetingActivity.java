@@ -22,6 +22,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.bumptech.glide.Glide;
@@ -55,15 +56,40 @@ public class AddMeetingActivity extends AppCompatActivity implements View.OnClic
     @BindView(R.id.btn_date)
     Button btnDatePicker;
     @BindView(R.id.in_date)
-    EditText txtDate;
+    TextView txtDate;
     @BindView(R.id.btn_time)
     Button btnTimePicker;
     @BindView(R.id.in_time)
-    EditText txtTime;
+    TextView txtTime;
     private int mYear, mMonth, mDay, mHour, mMinute;
 
     private MeetingApiService mApiService;
     private int color = Color.WHITE;
+    private Meeting inputMeeting;
+
+    private void checkInputsValid() {
+        boolean roomValid = !roomInput.getEditText().getText().equals("");
+        boolean dateValid = !txtDate.getText().toString().isEmpty();
+        boolean timeValid = !txtTime.getText().toString().isEmpty();
+        if (!(roomValid && dateValid && timeValid)) {
+            addButton.setEnabled(false);
+            return;
+        }
+
+        try {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd HH.mm");
+            String stringDate = txtDate.getText().toString() + " " + txtTime.getText().toString();
+            inputMeeting = new Meeting(
+                    color,
+                    roomInput.getEditText().getText().toString(),
+                    simpleDateFormat.parse(stringDate),
+                    Arrays.asList(emailsInput.getEditText().getText().toString())
+            );
+            addButton.setEnabled(!mApiService.isMeetingAlreadyExists(inputMeeting));
+        } catch (Exception e) {
+            addButton.setEnabled(false);
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -95,6 +121,7 @@ public class AddMeetingActivity extends AppCompatActivity implements View.OnClic
                         @Override
                         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                             txtDate.setText(year + "." + (monthOfYear+1) + "." + dayOfMonth);
+                            checkInputsValid();
                         }
                     }, mYear, mMonth, mDay);
             datePickerDialog.show();
@@ -108,6 +135,7 @@ public class AddMeetingActivity extends AppCompatActivity implements View.OnClic
                         @Override
                         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                             txtTime.setText(hourOfDay + "." + minute);
+                            checkInputsValid();
                         }
                     }, mHour, mMinute, true);
             timePickerDialog.show();
@@ -138,7 +166,7 @@ public class AddMeetingActivity extends AppCompatActivity implements View.OnClic
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
             @Override
             public void afterTextChanged(Editable s) {
-                addButton.setEnabled(s.length() > 0);
+                checkInputsValid();
             }
         });
 
@@ -146,23 +174,8 @@ public class AddMeetingActivity extends AppCompatActivity implements View.OnClic
 
     @OnClick(R.id.create)
     void addMeeting() {
-        try {
-            Log.i("neighbour", "AddMeetingActivity.addMeeting");
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd HH.mm");
-            String stringDate = txtDate.getText().toString() + " " + txtTime.getText().toString();
-            Meeting meeting = new Meeting(
-                    4,
-                    color,
-                    roomInput.getEditText().getText().toString(),
-                    simpleDateFormat.parse(stringDate),
-                    Arrays.asList(emailsInput.getEditText().getText().toString())
-            );
-            Log.i("neighbour", "AddMeetingActivity.addMeeting call createMeeting(meeting)");
-            mApiService.createMeeting(meeting);
-            finish();
-        } catch (Exception e) {
-            Log.i("neighbour", "AddMeetingActivity.addMeeting exception " + e);
-        }
+        mApiService.createMeeting(inputMeeting);
+        finish();
     }
 
     /**

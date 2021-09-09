@@ -24,26 +24,23 @@ public class DummyMeetingApiService implements MeetingApiService {
     static public String NO_DATE_FILTER = "All dates";
     private String dateBeginFilter = DummyMeetingApiService.NO_DATE_FILTER;
     private String dateEndFilter = DummyMeetingApiService.NO_DATE_FILTER;
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd HH.mm");
 
-    @Override
-    public void restore() {
-        ALL_ROOMS = "All rooms";
-        NO_DATE_FILTER = "All dates";
+    public DummyMeetingApiService() {
+        Log.i("neighbour","DummyMeetingApiService.DummyMeetingApiService ");
         meetings = DummyMeetingGenerator.generateMeetings();
-        filteredMeetings = new ArrayList<Meeting>();
+        for (Meeting meeting : meetings) {
+            Log.i("neighbour","DummyMeetingApiService.DummyMeetingApiService = " + meeting.getRoom());
+        }
         roomFilter = DummyMeetingApiService.ALL_ROOMS;
         dateBeginFilter = DummyMeetingApiService.NO_DATE_FILTER;
         dateEndFilter = DummyMeetingApiService.NO_DATE_FILTER;
+        filteredMeetings = new ArrayList<Meeting>();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<Meeting> getFilteredMeetings() {
-        Log.i("neighbour","DummyMeetingApiService.getFilteredMeetings " + roomFilter);
-        filteredMeetings.clear();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd HH.mm");
+    private List<Meeting> getLocalFilteredMeetings(String roomFilter, String dateBeginFilter, String dateEndFilter) {
+        List<Meeting> filteredMeetings = new ArrayList<Meeting>();
+        Log.i("neighbour","DummyMeetingApiService.getFilteredMeetings " + roomFilter + " " + dateBeginFilter + " " + dateEndFilter + " " + filteredMeetings.size());
         Date dateBegin = null;
         try {
             dateBegin = simpleDateFormat.parse(dateBeginFilter);
@@ -61,15 +58,31 @@ public class DummyMeetingApiService implements MeetingApiService {
             dateEndFilter = NO_DATE_FILTER;
         }
         for(Meeting meeting : meetings) {
-            Log.i("neighbour","DummyMeetingApiService.getFilteredMeetings meeting.getRoom() " + meeting.getRoom() + " " + meeting.getId());
-            if ((roomFilter.equals(ALL_ROOMS) || roomFilter.equals(meeting.getRoom()))
-               && (dateBeginFilter.equals(NO_DATE_FILTER) || (meeting.getDate().after(dateBegin)) || (meeting.getDate().equals(dateBegin)))
-               && (dateEndFilter.equals(NO_DATE_FILTER) || (meeting.getDate().before(dateEnd))) || (meeting.getDate().equals(dateEnd)))
+            Log.i("neighbour","DummyMeetingApiService.getFilteredMeetings meeting.getRoom() " + meeting.getRoom() + " " + roomFilter + " " + dateBeginFilter + " " + dateEndFilter);
+            if (((roomFilter.equals(ALL_ROOMS)) || (meeting.getRoom().equals(roomFilter)))
+                    && ((dateBeginFilter.equals(NO_DATE_FILTER)) || (meeting.getDate().after(dateBegin)) || (meeting.getDate().equals(dateBegin)))
+                    && ((dateEndFilter.equals(NO_DATE_FILTER)) || (meeting.getDate().before(dateEnd)) || (meeting.getDate().equals(dateEnd))))
             {
                 filteredMeetings.add(meeting);
             }
         }
         return filteredMeetings;
+    }
+
+    @Override
+    public boolean isMeetingAlreadyExists(Meeting meeting) {
+        String stringDate = simpleDateFormat.format(meeting.getDate());
+        Log.i("neighbour","DummyMeetingApiService.isMeetingAlreadyExists1 filteredMeetings.size()  " + meeting.getRoom() + " " + stringDate + " " + filteredMeetings.size());
+        List<Meeting> filteredMeetings = getLocalFilteredMeetings(meeting.getRoom(), stringDate, stringDate);
+        Log.i("neighbour","DummyMeetingApiService.isMeetingAlreadyExists2 filteredMeetings.size()  " + meeting.getRoom() + " " + stringDate + " " + filteredMeetings.size());
+        return (filteredMeetings.size() > 0);
+    }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Meeting> getFilteredMeetings() {
+        return getLocalFilteredMeetings(roomFilter, dateBeginFilter, dateEndFilter);
     }
 
     /**
@@ -88,7 +101,6 @@ public class DummyMeetingApiService implements MeetingApiService {
     public void createMeeting(Meeting meeting) {
         meeting.setId(generateId());
         Log.i("neighbour","DummyMeetingApiService.registerFilter create " + meeting.getRoom() + " " + meeting.getId());
-
         meetings.add(meeting);
     }
     private Boolean isIdFound(long id) {

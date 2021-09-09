@@ -20,8 +20,8 @@ DummyMeetingGenerator {
 
     public static int DUMMY_COLORS[] = {Color.BLUE, Color.RED, Color.GREEN, Color.YELLOW, Color.MAGENTA, Color.WHITE, Color.BLACK};
     public static List<Meeting> DUMMY_MEETINGS = Arrays.asList(
-        new Meeting(1, DUMMY_COLORS[0],"SALLE A", simpleDateFormat.parse("2021.08.23 05.30", pos1), Arrays.asList(new String("caroline@gmail.com"))),
-        new Meeting(2, DUMMY_COLORS[3],"SALLE B", simpleDateFormat.parse("2021.08.23 06.30", pos2), Arrays.asList(new String("jack@gmail.com"),
+        new Meeting(DUMMY_COLORS[0],"SALLE A", simpleDateFormat.parse("2021.08.23 05.30", pos1), Arrays.asList(new String("caroline@gmail.com"))),
+        new Meeting(DUMMY_COLORS[3],"SALLE B", simpleDateFormat.parse("2021.08.23 06.30", pos2), Arrays.asList(new String("jack@gmail.com"),
                 new String("helene@gmail.com"), new String("lea@gmail.com")))
     );
 

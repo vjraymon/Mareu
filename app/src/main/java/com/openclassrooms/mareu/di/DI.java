@@ -23,6 +23,7 @@ public class DI {
      * @return
      */
     public static MeetingApiService getNewInstanceApiService() {
-        return new DummyMeetingApiService();
+        service = new DummyMeetingApiService();
+        return service;
     }
 }

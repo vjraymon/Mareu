@@ -39,8 +39,8 @@ public class Meeting {
      * @param date
      * @param emails
      */
-    public Meeting(long id, int color, String room, Date date, List<String> emails) {
-        this.id = id;
+    public Meeting(int color, String room, Date date, List<String> emails) {
+        this.id = 0; // should be updated when added to the list of meetings
         this.color = color;
         this.room = room;
         this.date = date;
@@ -84,7 +84,7 @@ public class Meeting {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Meeting meeting = (Meeting) o;
-        return Objects.equals(id, meeting.id);
+        return (Objects.equals(room, meeting.room) && Objects.equals(date, meeting.date));
     }
 
     @Override

@@ -32,9 +32,9 @@ public class MeetingFragment extends Fragment {
     private MeetingApiService mApiService;
     private List<Meeting> mMeetings;
     private RecyclerView mRecyclerView;
-    private String roomFilter = DummyMeetingApiService.ALL_ROOMS;
-    private String dateBeginFilter = DummyMeetingApiService.NO_DATE_FILTER;
-    private String dateEndFilter = DummyMeetingApiService.NO_DATE_FILTER;
+//    private String roomFilter = DummyMeetingApiService.ALL_ROOMS;
+//    private String dateBeginFilter = DummyMeetingApiService.NO_DATE_FILTER;
+//    private String dateEndFilter = DummyMeetingApiService.NO_DATE_FILTER;
 
     /**
      * Create and return a new instance
@@ -62,14 +62,16 @@ public class MeetingFragment extends Fragment {
         mRecyclerView = (RecyclerView) view;
         mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+        initList();
         return view;
     }
 
     /**
      * Init the List of meetings
      */
-    private void initList() {
+    public void initList() {
         Log.i("neighbour","MeetingFragment.initlist");
+        mApiService = DI.getMeetingApiService();
         mMeetings = mApiService.getFilteredMeetings();
         mRecyclerView.setAdapter(new MyMeetingRecyclerViewAdapter(mMeetings));
     }
@@ -77,14 +79,14 @@ public class MeetingFragment extends Fragment {
     /**
      * Init the List of meetings
      */
-    public void filterList(String room, String dateBegin, String dateEnd) {
-        Log.i("neighbour","MeetingFragment.filterlist " + room);
-        roomFilter = room;
-        dateBeginFilter = dateBegin;
-        dateEndFilter = dateEnd;
-        mApiService.registerFilter(roomFilter, dateBegin, dateEnd);
-        initList();
-    }
+//    public void filterList(String room, String dateBegin, String dateEnd) {
+//        Log.i("neighbour","MeetingFragment.filterlist " + room);
+//        roomFilter = room;
+//        dateBeginFilter = dateBegin;
+//        dateEndFilter = dateEnd;
+//        mApiService.registerFilter(room, dateBegin, dateEnd);
+//        initList();
+//    }
 
     @Override
     public void onStart() {
