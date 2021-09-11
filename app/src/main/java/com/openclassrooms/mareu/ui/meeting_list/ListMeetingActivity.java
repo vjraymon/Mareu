@@ -76,6 +76,7 @@ public class ListMeetingActivity extends AppCompatActivity implements View.OnCli
          if (findViewById(R.id.container) != null) {
             if (savedInstanceState != null) {
                 mApiService = DI.getNewInstanceApiService();
+                roomFilter = DummyMeetingApiService.ALL_ROOMS;
                 initRoomSpinner();
                 initDateFilter(DummyMeetingApiService.NO_DATE_FILTER);
             }

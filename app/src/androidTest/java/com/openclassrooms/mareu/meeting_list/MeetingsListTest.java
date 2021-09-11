@@ -24,6 +24,7 @@ import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static android.support.test.espresso.action.ViewActions.scrollTo;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.RootMatchers.isPlatformPopup;
@@ -60,21 +61,25 @@ public class MeetingsListTest {
     public void setUp() {
         mActivity = mActivityRule.getActivity();
         assertThat(mActivity, notNullValue());
-/*
-        mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
+ //       mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        timeWait();
+    }
+
+    void timeWait() {
         try {
-            Thread.sleep(50);
+            Thread.sleep(2000);
         } catch (Exception e) {
             return;
         }
-*/
     }
 
     void addItem (String room, int year, int month, int day, int hour, int minute) {
         // When perform a click on a add icon
         onView(allOf(ViewMatchers.withId(R.id.add_meeting)))
                 .perform(click());
+        timeWait();
         // Enter room
         onView(ViewMatchers.withId(R.id.room))
                 .perform(typeText(room), closeSoftKeyboard());
@@ -96,7 +101,7 @@ public class MeetingsListTest {
                 .perform(click());
         // Click on the button add
         onView(ViewMatchers.withId(R.id.create))
-                .perform(click());
+                .perform(scrollTo(), click());
         onView(ViewMatchers.withId(R.id.list_meetings))
                 .check(matches(ViewMatchers.isDisplayed()));
         // Then : the number of element is incremented by 1
@@ -120,12 +125,14 @@ public class MeetingsListTest {
      */
     @Test
     public void myMeetingsList_deleteAction_shouldRemoveItem() {
-        // Given : We remove the element at position 1
+        // Given : We check the current number of item
         onView(allOf(ViewMatchers.withId(R.id.list_meetings),ViewMatchers.isDisplayed()))
                 .check(withItemCount(ITEMS_COUNT));
-        // When perform a click on a delete icon
+        // add a meeting
+        addItem("SALLE B", 2021, 9, 6, 14, 0);
+        // When perform a click on a delete icon of the latest position
         onView(allOf(ViewMatchers.withId(R.id.list_meetings),ViewMatchers.isDisplayed()))
-                .perform(RecyclerViewActions.actionOnItemAtPosition(0, new DeleteViewAction()));
+                .perform(RecyclerViewActions.actionOnItemAtPosition(ITEMS_COUNT - 1, new DeleteViewAction()));
         // Then : the number of element is decremented by 1
         onView(allOf(ViewMatchers.withId(R.id.list_meetings),ViewMatchers.isDisplayed()))
                 .check(withItemCount(ITEMS_COUNT-1));
@@ -140,9 +147,10 @@ public class MeetingsListTest {
         // Given : We start on the first activity
         onView(ViewMatchers.withId(R.id.list_meetings))
                 .check(matches(ViewMatchers.isDisplayed()));
-        // When perform a click on a delete icon
+        // When perform a click on the add icon
         onView(allOf(ViewMatchers.withId(R.id.add_meeting),ViewMatchers.isDisplayed()))
                 .perform(click());
+        timeWait();
         // Then : the avatar is displayed
         onView(ViewMatchers.withId(R.id.avatar))
                 .check(matches(ViewMatchers.isDisplayed()));
@@ -164,6 +172,7 @@ public class MeetingsListTest {
         // When perform a click on a add icon
         onView(allOf(ViewMatchers.withId(R.id.add_meeting),ViewMatchers.isDisplayed()))
                 .perform(click());
+        timeWait();
         // Then : enter "SALLE C"
         onView(ViewMatchers.withId(R.id.room))
                 .perform(typeText("SALLE C"), closeSoftKeyboard());
@@ -188,6 +197,7 @@ public class MeetingsListTest {
         // When perform a click on a add icon
         onView(allOf(ViewMatchers.withId(R.id.add_meeting),ViewMatchers.isDisplayed()))
                 .perform(click());
+        timeWait();
         // When perform a click on the date button
         onView(allOf(ViewMatchers.withId(R.id.btn_date),ViewMatchers.isDisplayed()))
                 .perform(click());
@@ -217,6 +227,7 @@ public class MeetingsListTest {
         // When perform a click on a add icon
         onView(allOf(ViewMatchers.withId(R.id.add_meeting),ViewMatchers.isDisplayed()))
                 .perform(click());
+        timeWait();
         // When perform a click on the time button
         onView(allOf(ViewMatchers.withId(R.id.btn_time),ViewMatchers.isDisplayed()))
                 .perform(click());
@@ -246,6 +257,7 @@ public class MeetingsListTest {
         // When perform a click on a add icon
         onView(allOf(ViewMatchers.withId(R.id.add_meeting),ViewMatchers.isDisplayed()))
                 .perform(click());
+        timeWait();
         // Enter "SALLE C" (Move here as a workaround to refresh the button add)
         onView(ViewMatchers.withId(R.id.room))
                 .perform(typeText("SALLE C"), closeSoftKeyboard());
@@ -433,6 +445,7 @@ public class MeetingsListTest {
         // Click on the button return
 //        mActivity.finish();
     }
+
     /**
      * When we add an item and define a date filter
      */
@@ -474,6 +487,48 @@ public class MeetingsListTest {
                 .check(withItemCount(2));
         // Click on the button return
 //        mActivity.finish();
+    }
+
+    /**
+     * When we rota te the screen, the informations are lost
+     */
+    @Test
+    public void myMeetingsList_rotate() {
+        // Given : We start on the first activity
+        onView(ViewMatchers.withId(R.id.list_meetings))
+                .check(matches(ViewMatchers.isDisplayed()));
+        // add a meeting
+        addItem("SALLE J", 2021, 9, 9, 14, 30);
+        // Check the return to the main activity
+        onView(ViewMatchers.withId(R.id.list_meetings))
+                .check(matches(ViewMatchers.isDisplayed()));
+        // When perform a click on the position 0 SALLE I of the room filter spinner
+        onView(ViewMatchers.withId(R.id.spinnerRoom))
+                .perform(click());
+        onData(allOf(is(instanceOf(String.class)), is("All rooms")))
+                .inRoot(isPlatformPopup())
+                .perform(click());
+
+        onView(ViewMatchers.withId(R.id.spinnerRoom))
+                .check(matches(ViewMatchers.withSpinnerText(containsString("All rooms"))));
+        // When perform a click on the clear button
+        onView(allOf(ViewMatchers.withId(R.id.btn_dateClear), ViewMatchers.isDisplayed()))
+                .perform(click());
+        // check date
+        onView(ViewMatchers.withId(R.id.in_dateFilter))
+                .check(matches(ViewMatchers.withText("All dates")));
+        // Then : the number of element is greater than 2
+        onView(allOf(ViewMatchers.withId(R.id.list_meetings),ViewMatchers.isDisplayed()))
+                .check(withItemCount(ITEMS_COUNT));
+        assert(ITEMS_COUNT>2);
+        mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        timeWait();
+        mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        timeWait();
+        // Then : the number of element is greater than 2
+        onView(allOf(ViewMatchers.withId(R.id.list_meetings),ViewMatchers.isDisplayed()))
+                .check(withItemCount(2));
+        ITEMS_COUNT = 2;
     }
 
 }
