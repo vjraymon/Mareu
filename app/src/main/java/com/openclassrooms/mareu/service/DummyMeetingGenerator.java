@@ -14,15 +14,15 @@ import java.util.Random;
 public abstract class
 
 DummyMeetingGenerator {
- static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd hh.mm");
- static ParsePosition pos1 = new ParsePosition(0);
-    static ParsePosition pos2 = new ParsePosition(0);
+    public static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd hh.mm");
+//    private static ParsePosition pos1 = new ParsePosition(0);
+//    private static ParsePosition pos2 = new ParsePosition(0);
 
     public static int DUMMY_COLORS[] = {Color.BLUE, Color.RED, Color.GREEN, Color.YELLOW, Color.MAGENTA, Color.WHITE, Color.BLACK};
     public static List<Meeting> DUMMY_MEETINGS = Arrays.asList(
-        new Meeting(DUMMY_COLORS[0],"SALLE A", simpleDateFormat.parse("2021.08.23 05.30", pos1), Arrays.asList(new String("caroline@gmail.com"))),
-        new Meeting(DUMMY_COLORS[3],"SALLE B", simpleDateFormat.parse("2021.08.23 06.30", pos2), Arrays.asList(new String("jack@gmail.com"),
-                new String("helene@gmail.com"), new String("lea@gmail.com")))
+//        new Meeting(DUMMY_COLORS[0],"SALLE A", simpleDateFormat.parse("2021.08.23 05.30", pos1), Arrays.asList(new String("caroline@gmail.com"))),
+//        new Meeting(DUMMY_COLORS[3],"SALLE B", simpleDateFormat.parse("2021.08.23 06.30", pos2), Arrays.asList(new String("jack@gmail.com"),
+//                new String("helene@gmail.com"), new String("lea@gmail.com")))
     );
 
     static List<Meeting> generateMeetings() {
@@ -30,7 +30,22 @@ DummyMeetingGenerator {
         return meetings;
     }
 
-    public static int generateColor(int i) {
+    public static int generateColor() {
         return DUMMY_COLORS[new Random().nextInt(DUMMY_COLORS.length)];
+    }
+
+    public static List<String> generateRoomNames() {
+        return new ArrayList<> (Arrays.asList(
+            "SALLE A",
+            "SALLE B",
+            "SALLE C",
+            "SALLE D",
+            "SALLE E",
+            "SALLE F",
+            "SALLE G",
+            "SALLE H",
+            "SALLE I",
+            "SALLE J")
+        );
     }
 }

@@ -47,9 +47,26 @@ MeetingServiceTest {
 
     @Test
     public void deleteMeetingWithSuccess() {
-        Meeting meetingToDelete = service.getFilteredMeetings().get(0);
-        service.deleteMeeting(meetingToDelete);
-        assertFalse(service.getFilteredMeetings().contains(meetingToDelete));
+        Meeting meetingToCreate;
+        try {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd HH.mm");
+            meetingToCreate = new Meeting(
+                    Color.RED,
+                    "SALLE B",
+                    "Lyugi",
+                    simpleDateFormat.parse("2021.9.6 8.0"),
+                    Arrays.asList("jr@gmail.com")
+            );
+        } catch (Exception e) {
+            Log.i("neighbour", "createMeetingWithSuccess exception " + e);
+            meetingToCreate = null;
+            Assert.fail();
+        }
+            service.createMeeting(meetingToCreate);
+            List<Meeting> meetings = service.getFilteredMeetings();
+            Meeting meetingToDelete = meetings.get(meetings.size()-1);
+            service.deleteMeeting(meetingToDelete);
+            assertFalse(service.getFilteredMeetings().contains(meetingToDelete));
     }
 
     @Test
@@ -59,6 +76,7 @@ MeetingServiceTest {
             Meeting meetingToCreate = new Meeting(
                     Color.RED,
                     "SALLE B",
+                    "Lyugi",
                     simpleDateFormat.parse("2021.9.6 8.0"),
                     Arrays.asList("jr@gmail.com")
             );
@@ -86,6 +104,7 @@ MeetingServiceTest {
             service.createMeeting(new Meeting(
                     Color.RED,
                     "SALLE C",
+                    "Lyugi",
                     simpleDateFormat.parse("2021.9.6 8.0"),
                     Arrays.asList("jr@gmail.com")
             ));
@@ -105,12 +124,14 @@ MeetingServiceTest {
             service.createMeeting(new Meeting(
                     Color.RED,
                     "SALLE C",
+                    "Lyugi",
                     simpleDateFormat.parse("2021.9.6 8.0"),
                     Arrays.asList("jr@gmail.com")
             ));
             service.createMeeting(new Meeting(
                     Color.RED,
                     "SALLE C",
+                    "Lyugi",
                     simpleDateFormat.parse("2021.9.6 9.0"),
                     Arrays.asList("jr@gmail.com")
             ));
@@ -134,6 +155,7 @@ MeetingServiceTest {
             Meeting meetingToCreate = new Meeting(
                     Color.RED,
                     nameRoom,
+                    "Lyugi",
                     simpleDateFormat.parse("2021.9.6 10.10"),
                     Arrays.asList("jr@gmail.com")
             );
@@ -155,10 +177,12 @@ MeetingServiceTest {
             service.registerFilter(nameRoom, dateBegin, dateEnd);
             int initialMeetingNumber = service.getFilteredMeetings().size();
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd HH.mm");
+            //45 minutes duration by default
             Meeting meetingToCreate = new Meeting(
                     Color.RED,
                     "SALLE B",
-                    simpleDateFormat.parse(dateBegin),
+                    "Lyugi",
+                    simpleDateFormat.parse("2021.9.6 9.26"),
                     Arrays.asList("jr@gmail.com")
             );
             service.createMeeting(meetingToCreate);
@@ -182,6 +206,7 @@ MeetingServiceTest {
             Meeting meetingToCreate = new Meeting(
                     Color.RED,
                     "SALLE B",
+                    "Lyugi",
                     simpleDateFormat.parse(dateEnd),
                     Arrays.asList("jr@gmail.com")
             );
@@ -198,35 +223,40 @@ MeetingServiceTest {
     public void wholeFilteringWithSuccess() {
         try {
             String nameRoom = "SALLE C";
-            String dateBegin = "2021.9.6 10.10";
-            String dateEnd = "2021.9.6 12.0";
+            String dateBegin = "2021.9.6 10:10";
+            String dateEnd = "2021.9.6 12:0";
             service.registerFilter(nameRoom, dateBegin, dateEnd);
             int initialMeetingNumber = service.getFilteredMeetings().size();
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd HH.mm");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd HH:mm");
             Meeting meetingRoomOutOfScope = new Meeting(
                     Color.RED,
                     "SALLE B",
+                    "Lyugi",
                     simpleDateFormat.parse(dateBegin),
                     Arrays.asList("jr@gmail.com")
             );
             service.createMeeting(meetingRoomOutOfScope);
+            //45 minutes duration by default
             Meeting meetingDateBeginOutOfScope = new Meeting(
                     Color.RED,
                     nameRoom,
-                    simpleDateFormat.parse("2021.9.6 10.9"),
+                    "Lyugi",
+                    simpleDateFormat.parse("2021.9.6 9:25"),
                     Arrays.asList("jr@gmail.com")
             );
             service.createMeeting(meetingDateBeginOutOfScope);
             Meeting meetingDateEndOutOfScope = new Meeting(
                     Color.RED,
                     nameRoom,
-                    simpleDateFormat.parse("2021.9.6 12.01"),
+                    "Lyugi",
+                    simpleDateFormat.parse("2021.9.6 12:01"),
                     Arrays.asList("jr@gmail.com")
             );
             service.createMeeting(meetingDateEndOutOfScope);
             Meeting meetingInScope1 = new Meeting(
                     Color.RED,
                     nameRoom,
+                    "Lyugi",
                     simpleDateFormat.parse(dateBegin),
                     Arrays.asList("jr@gmail.com")
             );
@@ -234,6 +264,7 @@ MeetingServiceTest {
             Meeting meetingInScope2 = new Meeting(
                     Color.RED,
                     nameRoom,
+                    "Lyugi",
                     simpleDateFormat.parse(dateEnd),
                     Arrays.asList("jr@gmail.com")
             );
@@ -257,11 +288,65 @@ MeetingServiceTest {
             Meeting meetingToCreate = new Meeting(
                     Color.RED,
                     "SALLE C",
+                    "Lyugi",
                     simpleDateFormat.parse("2021.9.6 12.0"),
                     Arrays.asList("jr@gmail.com")
             );
             service.createMeeting(meetingToCreate);
             assert(service.isMeetingAlreadyExists(meetingToCreate));
+        } catch (Exception e) {
+            Log.i("neighbour", "createMeetingWithSuccess exception " + e);
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void isMeetingAlreadyExistsReturnTrue_collisionBefore() {
+        try {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd HH.mm");
+            Meeting meetingToCreate = new Meeting(
+                    Color.RED,
+                    "SALLE C",
+                    "Lyugi",
+                    simpleDateFormat.parse("2021.9.6 12.0"),
+                    Arrays.asList("jr@gmail.com")
+            );
+            service.createMeeting(meetingToCreate);
+            Meeting meetingToCreateBefore = new Meeting(
+                    Color.RED,
+                    "SALLE C",
+                    "Lyugi",
+                    simpleDateFormat.parse("2021.9.6 11.16"),
+                    Arrays.asList("jr@gmail.com")
+            );
+            assert(service.isMeetingAlreadyExists(meetingToCreateBefore));
+        } catch (Exception e) {
+            Log.i("neighbour", "createMeetingWithSuccess exception " + e);
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void isMeetingAlreadyExistsReturnTrue_collisionAfter() {
+        try {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd HH.mm");
+            Meeting meetingToCreate = new Meeting(
+                    Color.RED,
+                    "SALLE C",
+                    "Lyugi",
+                    simpleDateFormat.parse("2021.9.6 12.0"),
+                    Arrays.asList("jr@gmail.com")
+            );
+            service.createMeeting(meetingToCreate);
+            Meeting meetingToCreateAfter = new Meeting(
+                    Color.RED,
+                    "SALLE C",
+                    "Lyugi",
+                    simpleDateFormat.parse("2021.9.6 12.44"),
+                    Arrays.asList("jr@gmail.com")
+            );
+            assert(service.isMeetingAlreadyExists(meetingToCreateAfter
+            ));
         } catch (Exception e) {
             Log.i("neighbour", "createMeetingWithSuccess exception " + e);
             Assert.fail();
@@ -275,6 +360,7 @@ MeetingServiceTest {
             Meeting meetingToCreate = new Meeting(
                     Color.RED,
                     "SALLE C",
+                    "Lyugi",
                     simpleDateFormat.parse("2021.9.6 8.0"),
                     Arrays.asList("jr@gmail.com")
             );
@@ -282,6 +368,7 @@ MeetingServiceTest {
             Meeting meetingToCreate2 = new Meeting(
                     Color.RED,
                     "SALLE D",
+                    "Lyugi",
                     simpleDateFormat.parse("2021.9.6 8.0"),
                     Arrays.asList("jr@gmail.com")
             );

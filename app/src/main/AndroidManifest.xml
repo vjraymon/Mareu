@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.openclassrooms.mareu">
+    package="com.openclassrooms.mareu"
+    android:versionCode="1"
+    android:versionName="1.0">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -14,12 +16,12 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ui.meeting_list.AddMeetingActivity"
-            android:label="@string/activity_new_meeting"/>
+            android:label="@string/activity_new_meeting" />
         <activity
             android:name="com.openclassrooms.mareu.ui.meeting_list.ListMeetingActivity"
             android:label="Ma reunion"
             android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="sensor">
+            android:screenOrientation="fullSensor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

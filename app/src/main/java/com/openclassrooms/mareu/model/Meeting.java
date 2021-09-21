@@ -1,12 +1,5 @@
 package com.openclassrooms.mareu.model;
 
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
-
-import com.openclassrooms.mareu.service.DummyMeetingGenerator;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -23,7 +16,10 @@ public class Meeting {
     /** Full name */
     private String room;
 
-    /** Avatar */
+    /** Subject */
+    private String subject;
+
+    /** Date */
     private Date date;
 
     private long duration;
@@ -33,18 +29,19 @@ public class Meeting {
 
     /**
      * Constructor
-     * @param id
      * @param color
      * @param room
      * @param date
      * @param emails
      */
-    public Meeting(int color, String room, Date date, List<String> emails) {
+    public Meeting(int color, String room, String subject, Date date, List<String> emails) {
         this.id = 0; // should be updated when added to the list of meetings
         this.color = color;
         this.room = room;
+        this.subject = subject;
         this.date = date;
         this.emails = emails;
+        this.duration = 45*60*1000; // 45 minutes in milliseconds
     }
 
     public long getId() {
@@ -67,6 +64,12 @@ public class Meeting {
         this.room = room;
     }
 
+    public String getSubject() { return subject; }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
     public Date getDate() { return date; }
 
     public void setDate(Date date) {
@@ -77,6 +80,12 @@ public class Meeting {
 
     public void setEmails(List<String> emails) {
         this.emails = emails;
+    }
+
+    public long getDuration() { return duration; }
+
+    public void setDuration(long duration) {
+        this.duration = duration;
     }
 
     @Override

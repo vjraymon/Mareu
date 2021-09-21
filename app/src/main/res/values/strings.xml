@@ -1,7 +1,3 @@
 <resources>
-    <string name="app_name">Mareu</string>
-    <string name="tab_meeting_title">My meetings</string>
-    <string name="tab_favorites_title">Favorites</string>
     <string name="activity_new_meeting">New meeting</string>
-    <string name="activity_display_neighbour">Neighbour profile</string>
 </resources>

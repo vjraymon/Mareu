@@ -1,8 +1,8 @@
 package com.openclassrooms.mareu.ui.meeting_list;
 
-import android.graphics.Color;
-import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,8 +10,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.openclassrooms.mareu.R;
 import com.openclassrooms.mareu.events.DeleteMeetingEvent;
 import com.openclassrooms.mareu.model.Meeting;
@@ -21,10 +21,6 @@ import org.greenrobot.eventbus.EventBus;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 class MyMeetingRecyclerViewAdapter extends RecyclerView.Adapter<MyMeetingRecyclerViewAdapter.ViewHolder> {
 
@@ -48,10 +44,8 @@ class MyMeetingRecyclerViewAdapter extends RecyclerView.Adapter<MyMeetingRecycle
 
         holder.mMeetingName.setText(meeting.getRoom());
 
- //       Glide.with(holder.mMeetingAvatar.getContext())
- //               .load(meeting.getAvatarUrl())
- //               .apply(RequestOptions.circleCropTransform())
- //               .into(holder.mMeetingAvatar);
+        holder.mMeetingSubject.setText(meeting.getSubject());
+
         holder.mMeetingAvatar.setColorFilter(meeting.getColor());
 
         ParsePosition pos = new ParsePosition(0);
@@ -77,32 +71,33 @@ class MyMeetingRecyclerViewAdapter extends RecyclerView.Adapter<MyMeetingRecycle
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.item_list_avatar)
         public ImageView mMeetingAvatar;
-        @BindView(R.id.item_list_name)
+        public TextView mMeetingSubject;
         public TextView mMeetingName;
-        @BindView(R.id.item_list_date)
         public TextView mMeetingDate;
-        @BindView(R.id.item_list_email)
         public TextView mMeetingEmails;
-        @BindView(R.id.item_list_delete_button)
         public ImageButton mDeleteButton;
 
-        private Meeting neighbour;
+        private Meeting meeting;
 
-        public void setNeighbour(Meeting neighbour) {
-            this.neighbour = neighbour;
+        public void setNeighbour(Meeting meeting) {
+            this.meeting = meeting;
         }
 
         public ViewHolder(View view) {
             super(view);
-            ButterKnife.bind(this, view);
-            view.setOnClickListener(new View.OnClickListener() {
+            mMeetingAvatar = view.findViewById(R.id.item_list_avatar);
+            mMeetingSubject = view.findViewById(R.id.item_list_subject);
+            mMeetingName = view.findViewById(R.id.item_list_name);
+            mMeetingDate = view.findViewById(R.id.item_list_date);
+            mMeetingEmails = view.findViewById(R.id.item_list_email);
+            mDeleteButton = view.findViewById(R.id.item_list_delete_button);
+            mDeleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Log.i("neighbour", "click sur un element");
                     v.setEnabled(false);
-//                    EventBus.getDefault().post(new DisplayNeighbourEvent(neighbour));
+                    EventBus.getDefault().post(new DeleteMeetingEvent(meeting));
                 }
             });
         }
