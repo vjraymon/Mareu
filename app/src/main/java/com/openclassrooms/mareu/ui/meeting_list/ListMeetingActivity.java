@@ -53,8 +53,8 @@ public class ListMeetingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_meeting);
-        mToolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
+ //       mToolbar = findViewById(R.id.toolbar);
+ //       setSupportActionBar(mToolbar);
         Log.i("neighbour","ListMeetingActivity.onCreate reinit getNewInstanceApiService");
 
         initService(savedInstanceState);

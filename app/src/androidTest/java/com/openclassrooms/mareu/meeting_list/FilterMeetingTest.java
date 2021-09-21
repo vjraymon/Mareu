@@ -114,7 +114,7 @@ public class FilterMeetingTest {
         // reset the filters
         resetFilters();
         // add a meeting
-        addItem("SALLE F", 2021, 9, 5, 23, 15);
+        addItem("SALLE F", 2021, 9, 6, 23, 15);
         addItem("SALLE G", 2021, 9, 7, 0, 0);
         // duration 45 minutes, so it also belongs to next day
         addItem("SALLE H", 2021, 9, 7, 23, 59);
