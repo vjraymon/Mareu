@@ -195,7 +195,19 @@ MeetingServiceTest {
     }
 
     @Test
-    public void dateEndFilteringWithSuccess() {
+    public void
+
+
+
+
+
+
+
+
+
+
+
+    dateEndFilteringWithSuccess() {
         try {
             String nameRoom = DummyMeetingApiService.ALL_ROOMS;
             String dateBegin = DummyMeetingApiService.NO_DATE_FILTER;
